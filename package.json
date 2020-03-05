@@ -1,0 +1,35 @@
+{
+    "name": "full-text-search-query",
+    "version": "1.0.2",
+    "description": "full-text-search-query is a JavaScript library to help convert a user-friendly, Google-like search term into a valid Microsoft SQL Server full text search query.",
+    "keywords": [
+        "SQL Server",
+        "Full Text Search"
+    ],
+    "homepage": "https://github.com/roncli/full-text-search-query",
+    "bugs": {
+        "url": "https://github.com/roncli/full-text-search-query/issues",
+        "email": "roncli@roncli.com"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Ronald M. Clifford",
+        "email": "roncli@roncli.com",
+        "url": "http://www.roncli.com"
+    },
+    "contributors": [
+        {
+            "name": "Jonathan Wood",
+            "url": "http://www.softcircuits.com"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/roncli/full-text-search-query.git"
+    },
+    "engines": {
+        "node": ">=12.0.0"
+    },
+    "private": false,
+    "main": "ftsQuery.js"
+}

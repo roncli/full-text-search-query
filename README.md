@@ -1,0 +1,84 @@
+# full-text-search-query
+
+Based on [FullTextSearchQuery](https://github.com/SoftCircuits/FullTextSearchQuery) by Jonathan Wood.  Converted to JavaScript by Ronald M. Clifford.
+
+```
+npm install full-text-search-query
+```
+
+full-text-search-query is a JavaScript library that converts a user-friendly search term into a valid Microsoft SQL Server full-text-search query. The code attempts to detect and handle all cases where the query would otherwise cause SQL Server to generate an error.
+
+# Introduction
+Microsoft SQL Server provides a powerful full-text search feature. However, the syntax is rather cryptic, especially for non-programmers. Moreover, there are many conditions that can cause SQL Server to throw up an error if things aren't exactly right.
+
+This library converts a user-friendly, Google-like search term to the corresponding full-text search SQL query condition. Its goal is to never throw exceptions on badly formed input. It simply constructs the best valid query it can from the input.
+
+# Examples
+The following list shows how various input are transformed.
+
+| Input | Output | Description |
+| ---- | ---- | ---- |
+| abc | `FORMSOF(INFLECTIONAL, abc)` | Find inflectional forms of abc.
+| ~abc | `FORMSOF(THESAURUS, abc)` | Find thesaurus variations of abc.
+| "abc" | `"abc"` | Find exact term abc.
+| +abc | `"abc"` | Find exact term abc.
+| "abc" near "def" | `"abc" NEAR "def"` | Find exact term abc near exact term def.
+| abc* | `"abc*"` | Finds words that start with abc.
+| -abc def | `FORMSOF(INFLECTIONAL, def) AND NOT FORMSOF(INFLECTIONAL, abc)` | Find inflectional forms of def but not inflectional forms of abc. |
+| abc def | `FORMSOF(INFLECTIONAL, abc) AND FORMSOF(INFLECTIONAL, def)` | Find inflectional forms of both abc and def.
+| abc or def | `FORMSOF(INFLECTIONAL, abc) OR FORMSOF(INFLECTIONAL, def)` | Find inflectional forms of either abc or def.
+| &lt;+abc +def&gt; | `"abc" NEAR "def"` | Find exact term abc near exact term def.
+| abc and (def or ghi) | `FORMSOF(INFLECTIONAL, abc) AND (FORMSOF(INFLECTIONAL, def) OR FORMSOF(INFLECTIONAL, ghi))` | Find inflectional forms of both abc and either def or ghi.
+
+# Preventing SQL Server Errors
+Even after a syntactically correct query has been generated, SQL Server can still generate an error for some queries. For example, in the table above you can see that the ouput for `-abc def` swaps the two subexpressions. This is because `NOT FORMSOF(INFLECTIONAL, abc) AND FORMSOF(INFLECTIONAL, def)` will cause an error. SQL Server does not like the `NOT` at the start. In this example, the library will swap the two subexpressions (on either side of `AND`).
+
+After constructing a query, the library will check for this and several other error conditions and make corrections as necessary. The following table describes these conditions.
+
+| Term | Action Taken
+| ---- | ----
+| NOT term1 AND term2 | Subexpressions swapped.
+| NOT term1 | Expression discarded.
+| NOT term1 AND NOT term2 | Expression discarded if node is grouped (parenthesized) or is the root node; otherwise, the parent node may contain another subexpression that will make this one valid.
+| term1 OR NOT term2 | Expression discarded.
+| term1 NEAR NOT term2 | NEAR conjunction changed to AND.
+
+The library converts all NEAR conjunctions to AND when either subexpression is not an InternalNode with the form TermForms.Literal.
+
+# Usage
+Use the `transform()` method to convert a search expression to a valid SQL Server full-text search condition. This method takes a user-friendly search query and converts it to a correctly formed full-text search condition that can be passed to SQL Server's `CONTAINS` or `CONTAINSTABLE` functions. If the query contains invalid terms, the code will do what it can to return a valid search condition. If no valid terms were found, this method returns an empty string.
+
+```javascript
+const FtsQuery = require("full-text-search-query");
+const ftsQuery = new FtsQuery(true);
+const searchTerm = ftsQuery.transform(friendlyQuery);
+```
+
+In the following SQL query example, `@SearchTerm` is a reference to the string returned from `transform()`.
+
+```sql
+SELECT select_list
+FROM table AS FT_TBL INNER JOIN
+   CONTAINSTABLE(table, column, @SearchTerm) AS KEY_TBL
+   ON FT_TBL.unique_key_column = KEY_TBL.[KEY];
+```
+
+# Stop Words (Noise Words)
+One thing to be aware of is SQL Server's handling of stop words. Stop words are words such as *a*, *and*, and *the*. These words are not included in the full-text index. SQL Server does not index these words because they are very common and don't really add to the quality of the search. Since these words are not indexed, SQL Server will never find a match for these words. The result is that a search for a stop word will return no results, even though that stop word may appear in your articles.
+
+The best way to handle this seems to be to exclude these words from the SQL query. This library allows you to do this by adding stop words to the `StopWords` collection property. Stop words will not be included in the resulting query unless they are quoted, thereby preventing stop words in the query from blocking all results.
+
+Alternatively, SQL Server provides an option for preventing the issue described above. The transform noise words option can be used to enable SQL Server to return matches even when the query contains a stop word (noise word). Set this option to 1 to enable noise word transformation.
+
+The following query can be used to get the system stop words from a SQL Server database.
+
+```sql
+SELECT ssw.stopword, slg.name
+FROM sys.fulltext_system_stopwords ssw
+JOIN sys.fulltext_languages slg
+ON slg.lcid = ssw.language_id
+WHERE slg.lcid = 1033
+```
+
+# More Information
+For more information and a discussion of the original C# library's code, please see Jonathan Wood's article [Easy Full-Text Search Queries](http://www.blackbeltcoder.com/Articles/data/easy-full-text-search-queries).
