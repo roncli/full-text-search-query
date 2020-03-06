@@ -3,9 +3,9 @@
 // Licensed under the MIT license.
 
 /**
- * @typedef {import("./index").ConjunctionType} ConjunctionType
- * @typedef {import("./index").INode} INode
- * @typedef {import("./index").TermForm} TermForm
+ * @typedef {import("./types/index").ConjunctionType} ConjunctionType
+ * @typedef {import("./types/index").INode} INode
+ * @typedef {import("./types/index").TermForm} TermForm
  */
 
 const InternalNode = require("./internalNode"),

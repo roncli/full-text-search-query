@@ -3,7 +3,7 @@
 // Licensed under the MIT license.
 
 /**
- * @typedef {import("./index").Predicate} Predicate
+ * @typedef {import("./types/index").Predicate} Predicate
  */
 
 const nullChar = "\0";
