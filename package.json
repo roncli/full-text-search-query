@@ -1,6 +1,6 @@
 {
     "name": "full-text-search-query",
-    "version": "1.0.2",
+    "version": "v1.0.3-beta.1",
     "description": "full-text-search-query is a JavaScript library to help convert a user-friendly, Google-like search term into a valid Microsoft SQL Server full text search query.",
     "keywords": [
         "SQL Server",
