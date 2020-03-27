@@ -13,10 +13,10 @@ const InternalNode = require("./internalNode"),
     StandardStopWords = require("./standardStopWords"),
     TerminalNode = require("./terminalNode"),
 
-    andRegex = /and/i,
-    nearRegex = /near/i,
-    notRegex = /not/i,
-    orRegex = /or/i;
+    andRegex = /^and$/i,
+    nearRegex = /^near$/i,
+    notRegex = /^not$/i,
+    orRegex = /^or$/i;
 
 /**
  * @type {string} Characters not allowed in unquoted search terms.
