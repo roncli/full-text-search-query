@@ -24,11 +24,6 @@ const InternalNode = require("./internalNode"),
 const punctuation = "~\"`!@#$%^&*()-+=[]{}\\|;:,.<>?/";
 
 /**
- * @type {string[]} Collection of stop words.  These words will not be included in the resulting query unless quoted.
- */
-const stopWords = [];
-
-/**
  * Class to convert user-friendly search term to SQL Server full-text search syntax.  Supports a Google-like syntax as described in the remarks.  No exceptions are thrown for badly formed input.  The code simply constructs the best query it can.
  * @example <caption>The following list shows how various syntaxes are interpreted.</caption>
  * abc                     Find inflectional forms of abc
@@ -46,11 +41,18 @@ const stopWords = [];
 class FTSQuery {
     /**
      * Constructs an ftsQuery instance.
-     * @param {boolean} [addStopWords] If true, the standard stopwords are added to the stopword list.
+     * @param {boolean} [addStandardStopWords] If true, the standard list of stopwords are added to the stopword list.
      */
-    constructor(addStopWords) {
-        if (addStopWords) {
-            stopWords.concat(StandardStopWords.StopWords);
+    constructor(addStandardStopWords) {
+        /**
+         * @type {string[]} Collection of stop words.  These words will not be included in the resulting query unless quoted.
+         */
+        this.stopWords = [];
+
+        if (addStandardStopWords) {
+            for (const word of StandardStopWords.StopWords) {
+                this.stopWords.push(word);
+            }
         }
     }
 
@@ -60,7 +62,7 @@ class FTSQuery {
      * @returns {boolean} A boolean indicating if the word is a stop word.
      */
     isStopWord(word) {
-        return stopWords.indexOf(word) !== -1;
+        return this.stopWords.indexOf(word) !== -1;
     }
 
     /**
