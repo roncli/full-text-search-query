@@ -1,5 +1,5 @@
-// Copyright (c) 2019-2020 Jonathan Wood (www.softcircuits.com)
-// Copyright (c) 2020 Ronald M. Clifford
+// Copyright (c) 2019-2021 Jonathan Wood (www.softcircuits.com)
+// Copyright (c) 2020-2022 Ronald M. Clifford
 // Licensed under the MIT license.
 
 module.exports = {

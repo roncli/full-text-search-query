@@ -1,5 +1,5 @@
-// Copyright (c) 2019-2020 Jonathan Wood (www.softcircuits.com)
-// Copyright (c) 2020 Ronald M. Clifford
+// Copyright (c) 2019-2021 Jonathan Wood (www.softcircuits.com)
+// Copyright (c) 2020-2022 Ronald M. Clifford
 // Licensed under the MIT license.
 
 /**
@@ -160,14 +160,14 @@ class FTSQuery {
                         break;
                     case "(":
                         // Parse parentheses block
-                        term = this.extractBlock(parser, "(", ")");
+                        term = FTSQuery.extractBlock(parser, "(", ")");
                         node = this.parseNode(term, defaultConjunction);
                         root = this.addNode(root, node, conjunction, true);
                         resetState = true;
                         break;
                     case "<":
                         // Parse angle brackets block
-                        term = this.extractBlock(parser, "<", ">");
+                        term = FTSQuery.extractBlock(parser, "<", ">");
                         node = this.parseNode(term, "Near");
                         root = this.addNode(root, node, conjunction);
                         resetState = true;
@@ -194,7 +194,6 @@ class FTSQuery {
 
         return root;
     }
-
 
     /**
      * Fixes any portions of the expression tree that would produce an invalid SQL Server full-text query.
@@ -229,7 +228,7 @@ class FTSQuery {
             // Correct subexpressions incompatible with conjunction type
             if (internalNode.conjunction === "Near") {
                 // If either subexpression is incompatible with NEAR conjunction then change to AND
-                if (this.isInvalidWithNear(internalNode.leftChild) || this.isInvalidWithNear(internalNode.rightChild)) {
+                if (FTSQuery.isInvalidWithNear(internalNode.leftChild) || FTSQuery.isInvalidWithNear(internalNode.rightChild)) {
                     internalNode.conjunction = "And";
                 }
             } else if (internalNode.conjunction === "Or") {
@@ -266,7 +265,10 @@ class FTSQuery {
         }
 
         // Eliminate expression group if it contains only exclude expressions
-        return (node.grouped || isRoot) && node.exclude ? null : node;
+        if (!node || ((node.grouped || isRoot) && node.exclude)) {
+            return null;
+        }
+        return node;
     }
 
     /**
@@ -274,7 +276,7 @@ class FTSQuery {
      * @param {INode} node Node to test
      * @returns {boolean} Whether the specified node is invalid.
      */
-    isInvalidWithNear(node) {
+    static isInvalidWithNear(node) {
         // NEAR is only valid with TerminalNodes with form TermForms.Literal
         return !(node instanceof TerminalNode) || node.termForm !== "Literal";
     }
@@ -341,7 +343,7 @@ class FTSQuery {
      * @param {string} closeChar End-of-block delimiter
      * @returns {string} The extracted text
      */
-    extractBlock(parser, openChar, closeChar) {
+    static extractBlock(parser, openChar, closeChar) {
         // Track delimiter depth
         let depth = 1;
 

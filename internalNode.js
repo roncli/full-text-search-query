@@ -1,5 +1,5 @@
-// Copyright (c) 2019-2020 Jonathan Wood (www.softcircuits.com)
-// Copyright (c) 2020 Ronald M. Clifford
+// Copyright (c) 2019-2021 Jonathan Wood (www.softcircuits.com)
+// Copyright (c) 2020-2022 Ronald M. Clifford
 // Licensed under the MIT license.
 
 /**
@@ -32,6 +32,15 @@ class InternalNode {
      * @returns {string} The node represented as a string.
      */
     toString() {
+        if (!this.leftChild && !this.rightChild) {
+            return "";
+        }
+        if (!this.leftChild) {
+            return this.rightChild.toString();
+        }
+        if (!this.rightChild) {
+            return this.leftChild.toString();
+        }
         return `${this.grouped ? "(" : ""}${this.leftChild.toString()} ${this.conjunction ? `${this.conjunction.toUpperCase()} ` : ""}${this.rightChild.toString()}${this.grouped ? ")" : ""}`;
     }
 }
