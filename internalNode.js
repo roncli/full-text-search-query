@@ -19,13 +19,13 @@ class InternalNode {
         this.grouped = false;
 
         /** @type {INode} */
-        this.leftChild = void 0;
+        this.leftChild = null;
 
         /** @type {INode} */
-        this.rightChild = void 0;
+        this.rightChild = null;
 
         /** @type {ConjunctionType} */
-        this.conjunction = void 0;
+        this.conjunction = null;
     }
 
     /**

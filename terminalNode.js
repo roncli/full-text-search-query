@@ -19,10 +19,10 @@ class TerminalNode {
         this.grouped = false;
 
         /** @type {string} */
-        this.term = void 0;
+        this.term = null;
 
         /** @type {TermForm} */
-        this.termForm = void 0;
+        this.termForm = null;
     }
 
     /**

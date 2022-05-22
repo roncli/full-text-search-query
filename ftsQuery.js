@@ -213,7 +213,7 @@ class FTSQuery {
      */
     fixUpExpressionTree(node, isRoot) {
         if (!node) {
-            return void 0;
+            return null;
         }
 
         if (node instanceof InternalNode) {
@@ -233,17 +233,17 @@ class FTSQuery {
             } else if (internalNode.conjunction === "Or") {
                 // Eliminate subexpressions not valid with OR conjunction
                 if (this.isInvalidWithOr(internalNode.leftChild)) {
-                    internalNode.leftChild = void 0;
+                    internalNode.leftChild = null;
                 }
                 if (this.isInvalidWithOr(internalNode.rightChild)) {
-                    internalNode.rightChild = void 0;
+                    internalNode.rightChild = null;
                 }
             }
 
             // Handle eliminated child expressions
             if (!internalNode.leftChild && !internalNode.rightChild) {
                 // Eliminate parent node if both child nodes were eliminated
-                return void 0;
+                return null;
             } else if (!internalNode.leftChild) {
                 // Child1 eliminated so return only Child2
                 node = internalNode.rightChild;
@@ -264,7 +264,7 @@ class FTSQuery {
         }
 
         // Eliminate expression group if it contains only exclude expressions
-        return (node.grouped || isRoot) && node.exclude ? void 0 : node;
+        return (node.grouped || isRoot) && node.exclude ? null : node;
     }
 
     /**
